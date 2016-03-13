@@ -1,34 +1,94 @@
-import java.util.Scanner;
+//U10416018 陳宗佑
+import java.util.*;
 
 public class PrintCalendar{
+	//Call class Calendar
+	static Calendar calendar = new Calendar();
+	
 	public static void main(String[] args){
-		Scanner input = new Scanner(System.in);
-		
-		System.out.print("Enter full year (e.g., 2012): ");
-		int year = input.nextInt();
-		
-		System.out.print("Enter month as a number between 1 and 12: ");
-		int month = input.nextInt();
-		
-		printMonth(year, month);
-	}
+		int month = calendar.get(Calendar.MONTH) + 1;
+		int year = calendar.get(Calendar.YEAR);
+		//The first format for month, second for year
+		if (args.length == 2) {
+			
+			year = Integer.parseInt(args[1]);
+			month = Integer.parseInt(args[0]);
+
+			calendar.set(Calendar.YEAR, year);
+			calendar.set(Calendar.MONTH, month - 1);
+		}
+		//if user just enter the month, catch the recent year 
+		else if (args.length == 1) {
+      
+			month = Integer.parseInt(args[0]);
+			calendar.set(Calendar.MONTH, month-1);
+		}
+		//Set the date to the first day in month
+		calendar.set(Calendar.DATE, 1);
+		//Print the calendar for the month of the year 
+		printMonth(month, year);
+		}
+
 	
 	public static void printMonth(int year, int month){
-		printMonthTitle(year, month);
+		int startDay = getStartDay();
+		int numberOfDaysInMonth = calendar.daysInMonth();
 		
-		printMonthBody(year, month);
+		//Print the title of the calendar
+		printMonthTitle(year, month);
+		//Print the body of the calendar
+		printMonthBody(startDay, numberOfDaysInMonth);
 	}
 	
+	//Print the month title
 	public static void printMonthTitle(int year, int month){
-		System.out.println("        " + getMonthName(month) + "   " + year);
-		
+		System.out.println("        " + calendar.getMonthName() + "   " + calendar.get(Calendar.YEAR));
 		System.out.println("---------------------------");
 		System.out.println(" Sun Mon Tue Wed Thu Fri Sat");
 	}
 	
-	public static String getMonthName(int month){
+	
+	public static void printMonthBody(int startDay, int numberOfDaysInMonth){
+		int i = 0;
+		
+		//Print space before the first day of month
+		for(i = 0; i < (startDay - 1); i++){
+			System.out.print("    ");
+		}
+		for(i = 1; i <= numberOfDaysInMonth; i++){
+			System.out.printf("%4d", i);
+			
+			if((i + startDay - 1) % 7 == 0){
+				System.out.println();
+			}
+		}
+		System.out.println();
+	}
+	//Get start day of the week
+	static int getStartDay(){
+		return calendar.get(Calendar.DAY_OF_WEEK);
+	}
+}	
+//Subclass extends GregorianCalendar{	
+class Calendar extends GregorianCalendar{
+	//Catch the number of day in month
+	public int daysInMonth(){
+		int month = get(MONTH) + 1;
+		if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12){
+			return 31;
+		}
+		if(month == 4 || month == 6 || month == 9 || month == 11){
+			return 30;
+		}
+		if(month == 2){
+			return isLeapYear(get(YEAR)) ? 29 : 28;
+		}	
+		return 0; 
+	}
+	//Get the month name
+	public String getMonthName(){
 		String monthName = "";
-		switch (month){
+		switch (get(MONTH) + 1){
 			case 1: monthName = "January"; break;
 			case 2: monthName = "February"; break;
 			case 3: monthName = "March"; break;
@@ -44,63 +104,6 @@ public class PrintCalendar{
 		}
 		return monthName;
 	}
-	public static void printMonthBody(int year, int month){
-		int startDay = getStartDay(year, month);
-		
-		int numberOfDaysInMonth = getNumberOfDaysInMonth(year, month);
-		
-		int i = 0;
-		for(i = 0; i < startDay; i++){
-			System.out.print("    ");
-		}
-		for(i = 1; i <= numberOfDaysInMonth; i++){
-			System.out.printf("%4d", i);
-			
-			if((i + startDay) % 7 == 0){
-				System.out.println();
-			}
-		}
-		System.out.println();
-	}
-	
-	public static int getStartDay(int year, int month){
-		final int START_DAY_FOR_JAN_1_1800 = 3;
-		
-		int totalNumberOfDays = getTotalNumberOfDays(year, month);
-		
-		return(totalNumberOfDays + START_DAY_FOR_JAN_1_1800) % 7;
-	}
-	
-	public static int getTotalNumberOfDays(int year, int month){
-		int total = 0;
-		
-		for(int i = 1800; i < year; i++){
-			if(isLeapYear(i))
-				total = total + 366;
-			else
-				total = total + 365;
-		}
-		for(int i = 1800 ; i < month; i++){
-			total = total + getNumberOfDaysInMonth(year, i);
-		}		
-		return total;	
-	}
-	public static int getNumberOfDaysInMonth(int year, int month){
-		if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12){
-			return 31;
-		}
-		if(month == 4 || month == 6 || month == 9 || month == 11){
-			return 30;
-		}
-		if(month == 2){
-			return isLeapYear(year) ? 29 : 28;
-		}	
-			return 0; 
-	}	
-	public static boolean isLeapYear(int year){
-		return year % 400 ==0 || (year % 4 == 0 && year % 100 != 0);
-	}
-
 }
 
 
